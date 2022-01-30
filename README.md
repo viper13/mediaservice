@@ -1,6 +1,9 @@
 # Media Service
 Media service for downloading and stream media, planned for local network
 
+# Settings
+LogicController.js:8 root_folder - this variable contains path in system that will be a root for media displaying
+
 # Dependencies
 Installed nodejs https://nodejs.org/. It must be available from command prompt.
 
