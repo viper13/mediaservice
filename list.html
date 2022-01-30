@@ -214,5 +214,9 @@
   setInterval(() => {
     document.getElementById("list").style.height = videoObj.clientHeight + "px";
   }, 500);
+
+  videoObj.addEventListener('ended',function(){
+        playVideo(false);
+    },false);
   </script>
 </html>
