@@ -137,7 +137,8 @@ class LogicController {
 	}
 
 	processCommonFile(fileName, res) {
-		var fullFileName = path.resolve("C:\\home\\web_tests\\video.example\\", fileName);
+		//TODO:
+		var fullFileName = path.resolve("D:\\projects\\mediaservice\\", fileName);
 		fs.readFile(fullFileName, function (err, html) {
 			res.writeHeader(200, {"Content-Type": "text/html"});
 			res.write(html);
