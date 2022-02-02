@@ -137,7 +137,6 @@ class LogicController {
 	}
 
 	processCommonFile(fileName, res) {
-		//TODO:
 		console.log("Process common file: " + fileName);
 		var fullFileName = path.resolve("./", fileName);
 		fs.readFile(fullFileName, function (err, html) {
