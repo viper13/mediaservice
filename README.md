@@ -11,3 +11,6 @@ Installed ffmpeg https://www.ffmpeg.org/ it is neaded for video converting to mp
 
 # Run
 Need to execute command "node server.js" by current seting it start server on 8080 port.
+
+# Mongo DB
+expected DB 'mediaservice' and collection 'users'
