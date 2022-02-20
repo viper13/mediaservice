@@ -14,11 +14,20 @@ function writeNoFile(res) {
 	res.end();
 }
 
+function writeObj(res, object) {
+	res.writeHeader(200, {"Content-Type": "application/json"});
+	//console.log("RESPONCE:");
+	//console.log(object);
+	res.write(JSON.stringify(object));
+	res.end();
+}
+
 class LogicController {
 	constructor() { }
 
 	processRequest(req, res) {
 		var url_parts = url.parse(req.url, true);
+		console.log(url_parts);
 		if (req.url === "/") {
 			this.processDyrectoryRequest(path.resolve(root_folder), res);
 		} else if (req.url === "/favicon.ico") {
@@ -30,17 +39,28 @@ class LogicController {
 			var id = url_parts.query.id;
 			var action = url_parts.query.action;
 			if (action === "get") {
-				//TODO
+				const db = new DBController();
+				db.getOrAddUser(id).then(function(value) {
+					var result = value.recents;
+					if (result.path !== null) {
+						result.filename = path.basename(result.source);
+					}
+					writeObj(res, result);
+				});
 			}
 			else if (action === "set") {
-				//TODO
+				console.log("SET called: " + id);
+				const db = new DBController();
+				db.updateRecents(id, {path: url_parts.query.path, source: url_parts.query.source, time: 0, timestamp: Date.now()});
+				writeObj(res, "success");
 			}
 			else {
 				console.log("Bad recents action: " + action);
 				writeNoFile(res);
 			}
 		} else {
-			var file = path.resolve(root_folder, "." + decodeURI(req.url));
+			// TODO: add using file and time params from request
+			var file = path.resolve(root_folder, "." + decodeURI(url_parts.pathname));
 			var isDyrectoryAndNotEmpty = false;
 			try {
 				const fileStat = fs.statSync(file);

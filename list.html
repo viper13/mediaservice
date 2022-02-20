@@ -10,7 +10,7 @@
     </header>
     <nav id="globalnavigation">
     <p id="plaing">Plaing: </p>
-    <p>
+    <p id="recent">Last seen: <a id="recent_info" href=""></a></p>
       <script>
         var current_video;
         var prev_video = null;
@@ -39,6 +39,10 @@
               selectVideoForPlay(playlistdata[next_video]);
             }
           }
+          setTimeout(() => {
+            //RECHECK
+            document.getElementById("list").style.height = document.getElementById("video").clientHeight + "px";
+          }, 1000);
         }
         function setActiveNextPrevBtns()
         {
@@ -87,6 +91,11 @@
             video.src = "/video?src=" + source;
             video.load();
             video.play();
+
+            const path = "/recents?action=set&id=11111&path=" + window.location.pathname + "&source=" + source;
+            fetch(path).then((response) => {
+              console.log(response);
+            });
           }
         </script>
       </div>
@@ -181,8 +190,6 @@
   if (videolists.length === 0) {
     document.getElementById("playersection").style.display = "none";
     document.getElementById("globalnavigation").style.display = "none";
-  } else {
-    videolists[0].onclick();
   }
 
   var supportsOrientationChange = "onorientationchange" in window,
@@ -208,15 +215,27 @@
       // }
     }
   }, false);
-
-  var videoObj = document.getElementById("video");
-  var videosList = document.getElementById("list");
-  setInterval(() => {
-    document.getElementById("list").style.height = videoObj.clientHeight + "px";
-  }, 500);
-
-  videoObj.addEventListener('ended',function(){
-        playVideo(false);
-    },false);
+  document.getElementById("video").addEventListener('ended', function() {
+    playVideo(false);
+  }, false);
+  function onLoadedLogic() {
+    const path = "/recents?action=get&id=11111";
+    fetch(path)
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      //TODO: write a visualisation logic
+      if (data.path === null) {
+        document.getElementById("recent").style.display = "none";
+      } else {
+        var link = document.getElementById("recent_info");
+        link.href = encodeURI(data.path + "?file=" + data.filename + "&time=" + data.time);
+        link.innerHTML = data.source;
+      }
+      console.log(data);
+    });
+  }
+  setTimeout(onLoadedLogic, 1000);
   </script>
 </html>
