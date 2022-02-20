@@ -1,7 +1,8 @@
 var fs = require("fs"),
     http = require("http"),
     url = require("url"),
-    path = require("path");
+    path = require("path"),
+    DBController = require("./MongoController.js");
 
 var VideoConverter = require("./VideoConverter.js");
 
@@ -21,11 +22,23 @@ class LogicController {
 		if (req.url === "/") {
 			this.processDyrectoryRequest(path.resolve(root_folder), res);
 		} else if (req.url === "/favicon.ico") {
-			// TODO: recheck favicon
 			this.processCommonFile("." + req.url, res);
 		} else if (url_parts.pathname === "/video") {
 			var file = path.resolve(root_folder, "." + url_parts.query.src);
 			this.processFileRequest(file, req, res);
+		} else if (url_parts.pathname === "/recents") {
+			var id = url_parts.query.id;
+			var action = url_parts.query.action;
+			if (action === "get") {
+				//TODO
+			}
+			else if (action === "set") {
+				//TODO
+			}
+			else {
+				console.log("Bad recents action: " + action);
+				writeNoFile(res);
+			}
 		} else {
 			var file = path.resolve(root_folder, "." + decodeURI(req.url));
 			var isDyrectoryAndNotEmpty = false;
