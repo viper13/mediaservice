@@ -14,8 +14,8 @@ class VideoConverter {
             var file = path.resolve(this.folder, this.file);
             var new_file_name = path.resolve(path.normalize(this.folder + "\\" + path.parse(file).name + ".mp4"));
             //TODO: add clearing + from new filename - as result this files will have a problem
-            var command = 'ffmpeg -i "' + file + '" -ac 2 -b:v 2000k -c:a aac -c:v libx264 -b:a 160k -vprofile high -bf 0 -strict experimental -f mp4 "' + new_file_name + '"';
-
+            var command = 'ffmpeg -i "' + file + '" -f mp4 "' + new_file_name + '"';
+            //console.log(command);
             const ffmpeg = exec(command);
             ffmpeg.stdout.on('data', (data) => {
                 //console.log("OUT:");
