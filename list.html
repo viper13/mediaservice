@@ -15,6 +15,10 @@
         var current_video;
         var prev_video = null;
         var next_video = null;
+        var play_on_load = null;
+        var time_on_load = null;
+        var last_saved_time = 0;
+        const save_video_state_delta = 30;
         var playlistdata = new Object();
         _______JS_DATA____________
         function changeActiveId() {
@@ -82,20 +86,39 @@
         <video id="video" controls>
         </video>
         <script>
-          function selectVideoForPlay(source) {
+          function selectVideoForPlay(source, time = 0) {
             current_video = source;
+            last_saved_time = time;
             document.getElementById("plaing").innerHTML = "Plaing: " + decodeURI(source);
             setActiveNextPrevBtns();
             changeActiveId();
             var video = document.getElementById('video');
             video.src = "/video?src=" + source;
             video.load();
-            video.play();
-
-            const path = "/recents?action=set&id=11111&path=" + window.location.pathname + "&source=" + source;
-            fetch(path).then((response) => {
-              console.log(response);
+            try {
+              video.play();
+            }
+            catch (e) {
+              console.log(e);
+            }
+            if (time > 0) {
+              function setTimeForVideo() {
+                this.currentTime = time;
+              }
+              video.addEventListener('loadedmetadata', setTimeForVideo, false);
+            }
+            else {
+              video.removeEventListener('loadedmetadata', setTimeForVideo);
+            }
+            video.addEventListener("timeupdate", function(){
+                if(this.currentTime - last_saved_time > save_video_state_delta) {
+                  last_saved_time = this.currentTime;
+                  const path = "/recents?action=set&id=11111&path=" + window.location.pathname + "&source=" + current_video + "&time=" + last_saved_time;
+                  fetch(path);
+                }
             });
+            const path = "/recents?action=set&id=11111&path=" + window.location.pathname + "&source=" + current_video + "&time=" + last_saved_time;
+            fetch(path);
           }
         </script>
       </div>
@@ -235,6 +258,8 @@
       }
       console.log(data);
     });
+
+    selectVideoForPlay(playlistdata[play_on_load], time_on_load);
   }
   setTimeout(onLoadedLogic, 1000);
   </script>
