@@ -51,7 +51,7 @@ class LogicController {
 			else if (action === "set") {
 				console.log("SET called: " + id);
 				const db = new DBController();
-				db.updateRecents(id, {path: url_parts.query.path, source: url_parts.query.source, time: 0, timestamp: Date.now()});
+				db.updateRecents(id, {path: url_parts.query.path, source: url_parts.query.source, time: url_parts.query.time, timestamp: Date.now()});
 				writeObj(res, "success");
 			}
 			else {
@@ -60,25 +60,25 @@ class LogicController {
 			}
 		} else {
 			// TODO: add using file and time params from request
-			var file = path.resolve(root_folder, "." + decodeURI(url_parts.pathname));
+			var dyrectory = path.resolve(root_folder, "." + decodeURI(url_parts.pathname));
 			var isDyrectoryAndNotEmpty = false;
 			try {
-				const fileStat = fs.statSync(file);
+				const fileStat = fs.statSync(dyrectory);
 				isDyrectoryAndNotEmpty = fileStat.isDirectory();
 			}
 			catch {
-				console.log("WARNING: directory[" + file + "] is empty");
+				console.log("WARNING: directory[" + dyrectory + "] is empty");
 			}
 
 			if (isDyrectoryAndNotEmpty === true) {
-				this.processDyrectoryRequest(file, res);
+				this.processDyrectoryRequest(dyrectory, url_parts.query.file, url_parts.query.time, res);
 			} else {
 				writeNoFile(res);
 			}
 	    }
 	}
 
-	processDyrectoryRequest(dyrectory, res) {
+	processDyrectoryRequest(dyrectory, file, time, res) {
 		const replace_vid1_str = /________VIDEO_CONTENT1___________/g;
 		const replace_dir_list_str = /_______FOLDERS_LIST____________/g;
 		const replace_js_data_str = /_______JS_DATA____________/g;
@@ -118,6 +118,12 @@ class LogicController {
 						}
 					}
 				});
+				if (file !== null) {
+					js_data += "play_on_load='" + file + "';";
+				}
+				if (time !== null) {
+					js_data += "time_on_load=" + time + ";";
+				}
 				var file_data = html.toString();
 				res.writeHeader(200, {"Content-Type": "text/html"});
 				file_data = file_data.replace(replace_vid1_str, video_content);
