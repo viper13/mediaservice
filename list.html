@@ -89,7 +89,7 @@
         <video id="video" controls>
         </video>
         <script>
-          function selectVideoForPlay(source, time = 0) {
+          function selectVideoForPlay(source, time = 0, is_from_saved = false) {
             current_video = source;
             last_saved_time = time;
             document.getElementById("plaing").innerHTML = "Plaing: " + decodeURI(source);
@@ -120,8 +120,10 @@
                   fetch(path);
                 }
             });
-            const path = "/recents?action=set&id=" + deviceID + "&path=" + window.location.pathname + "&source=" + current_video + "&time=" + last_saved_time;
-            fetch(path);
+            if (is_from_saved === false) {
+              const path = "/recents?action=set&id=" + deviceID + "&path=" + window.location.pathname + "&source=" + current_video + "&time=" + last_saved_time;
+              fetch(path);
+            }
           }
         </script>
       </div>
@@ -261,8 +263,9 @@
       }
       console.log(data);
     });
-
-    selectVideoForPlay(playlistdata[play_on_load], time_on_load);
+    if (play_on_load) {
+      selectVideoForPlay(playlistdata[play_on_load], time_on_load, true);
+    }
   }
   setTimeout(onLoadedLogic, 1000);
   </script>
