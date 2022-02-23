@@ -1,7 +1,7 @@
 {
     "homepage": "https://github.com/viper13/mediaservice",
-    "url" : "https://github.com/viper13/mediaservice/issues",
-    "email" : "viper.kspu@gmail.com",
+    "url": "https://github.com/viper13/mediaservice/issues",
+    "email": "viper.kspu@gmail.com",
     "name": "mediaservice",
     "version": "1.0.0",
     "main": "server.js",
@@ -10,6 +10,7 @@
         "url": "git@github.com:viper13/mediaservice.git"
     },
     "dependencies": {
+        "device-uuid": "^1.0.4",
         "mongodb": "^4.1.0"
     }
-  }
+}

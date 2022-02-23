@@ -27,10 +27,11 @@ class LogicController {
 
 	processRequest(req, res) {
 		var url_parts = url.parse(req.url, true);
-		console.log(url_parts);
+		//console.log(url_parts);
 		if (req.url === "/") {
-			this.processDyrectoryRequest(path.resolve(root_folder), res);
-		} else if (req.url === "/favicon.ico") {
+			this.processDyrectoryRequest(path.resolve(root_folder), null, null, res);
+		} else if (req.url === "/favicon.ico"
+				   || req.url === "/frontjs/device-uuid.min.js") {
 			this.processCommonFile("." + req.url, res);
 		} else if (url_parts.pathname === "/video") {
 			var file = path.resolve(root_folder, "." + url_parts.query.src);
@@ -49,7 +50,6 @@ class LogicController {
 				});
 			}
 			else if (action === "set") {
-				console.log("SET called: " + id);
 				const db = new DBController();
 				db.updateRecents(id, {path: url_parts.query.path, source: url_parts.query.source, time: url_parts.query.time, timestamp: Date.now()});
 				writeObj(res, "success");
@@ -59,7 +59,6 @@ class LogicController {
 				writeNoFile(res);
 			}
 		} else {
-			// TODO: add using file and time params from request
 			var dyrectory = path.resolve(root_folder, "." + decodeURI(url_parts.pathname));
 			var isDyrectoryAndNotEmpty = false;
 			try {
