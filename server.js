@@ -31,6 +31,11 @@ app.get('/recents', function (req, res) {
 	logic.processRecentsRequest(req, res);
 });
 
+app.use("/", express.static(process.cwd()+"/angular/hello-world/dist/hello-world/"));
+app.get('/test', function (req, res) {
+	res.sendFile(process.cwd()+"/angular/hello-world/dist/hello-world/index.html");
+});
+
 app.all('*', function (req, res) {
 	var logic = new LogicController;
 	logic.processRequest(req, res);
