@@ -104,22 +104,27 @@
             catch (e) {
               console.log(e);
             }
-            if (time > 0) {
+            {
               function setTimeForVideo() {
                 this.currentTime = time;
               }
-              video.addEventListener('loadedmetadata', setTimeForVideo, false);
-            }
-            else {
               video.removeEventListener('loadedmetadata', setTimeForVideo);
+              if (time > 0) {
+                video.addEventListener('loadedmetadata', setTimeForVideo, false);
+              }
             }
-            video.addEventListener("timeupdate", function(){
-                if(this.currentTime - last_saved_time > save_video_state_delta) {
-                  last_saved_time = this.currentTime;
-                  const path = "/recents?action=set&id=" + deviceID + "&path=" + window.location.pathname + "&source=" + current_video + "&time=" + last_saved_time;
-                  fetch(path);
-                }
-            });
+            {
+              function updateVideoProgress() {
+                  if(this.currentTime - last_saved_time > save_video_state_delta) {
+                    last_saved_time = this.currentTime;
+                    const path = "/recents?action=set&id=" + deviceID + "&path=" + window.location.pathname + "&source=" + current_video + "&time=" + last_saved_time;
+                    fetch(path);
+                  }
+              }
+              video.removeEventListener('timeupdate', updateVideoProgress);
+              video.addEventListener("timeupdate", updateVideoProgress);
+            }
+
             if (is_from_saved === false) {
               const path = "/recents?action=set&id=" + deviceID + "&path=" + window.location.pathname + "&source=" + current_video + "&time=" + last_saved_time;
               fetch(path);

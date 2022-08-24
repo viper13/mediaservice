@@ -1,12 +1,9 @@
 var fs = require("fs"),
-    http = require("http"),
     url = require("url"),
     path = require("path"),
     DBController = require("./MongoController.js");
 
 var VideoConverter = require("./VideoConverter.js");
-
-var root_folder = "e:/donwloads/torrent";
 
 function writeNoFile(res) {
 	res.writeHeader(404, {"Content-Type": "text/html"});  
@@ -16,65 +13,62 @@ function writeNoFile(res) {
 
 function writeObj(res, object) {
 	res.writeHeader(200, {"Content-Type": "application/json"});
-	//console.log("RESPONCE:");
-	//console.log(object);
 	res.write(JSON.stringify(object));
 	res.end();
 }
 
 class LogicController {
 	constructor() { }
+	static rootFolder() {
+		return "e:/donwloads/torrent";
+	}
+	processRootRequest(res) {
+		this.processDyrectoryRequest(path.resolve(LogicController.rootFolder()), null, null, res);
+	}
 
 	processRequest(req, res) {
 		var url_parts = url.parse(req.url, true);
-		//console.log(url_parts);
-		if (req.url === "/") {
-			this.processDyrectoryRequest(path.resolve(root_folder), null, null, res);
-		} else if (req.url === "/favicon.ico"
-				   || req.url === "/frontjs/device-uuid.min.js") {
-			this.processCommonFile("." + req.url, res);
-		} else if (url_parts.pathname === "/video") {
-			var file = path.resolve(root_folder, "." + url_parts.query.src);
-			this.processFileRequest(file, req, res);
-		} else if (url_parts.pathname === "/recents") {
-			var id = url_parts.query.id;
-			var action = url_parts.query.action;
-			if (action === "get") {
-				const db = new DBController();
-				db.getOrAddUser(id).then(function(value) {
-					var result = value.recents;
-					if (result.path !== null) {
-						result.filename = path.basename(result.source);
-					}
-					writeObj(res, result);
-				});
-			}
-			else if (action === "set") {
-				const db = new DBController();
-				db.updateRecents(id, {path: url_parts.query.path, source: url_parts.query.source, time: url_parts.query.time, timestamp: Date.now()});
-				writeObj(res, "success");
-			}
-			else {
-				console.log("Bad recents action: " + action);
-				writeNoFile(res);
-			}
-		} else {
-			var dyrectory = path.resolve(root_folder, "." + decodeURI(url_parts.pathname));
-			var isDyrectoryAndNotEmpty = false;
-			try {
-				const fileStat = fs.statSync(dyrectory);
-				isDyrectoryAndNotEmpty = fileStat.isDirectory();
-			}
-			catch {
-				console.log("WARNING: directory[" + dyrectory + "] is empty");
-			}
+		var dyrectory = path.resolve(LogicController.rootFolder(), "." + decodeURI(url_parts.pathname));
+		var isDyrectoryAndNotEmpty = false;
+		try {
+			const fileStat = fs.statSync(dyrectory);
+			isDyrectoryAndNotEmpty = fileStat.isDirectory();
+		}
+		catch {
+			console.log("WARNING: directory[" + dyrectory + "] is empty");
+		}
 
-			if (isDyrectoryAndNotEmpty === true) {
-				this.processDyrectoryRequest(dyrectory, url_parts.query.file, url_parts.query.time, res);
-			} else {
-				writeNoFile(res);
-			}
-	    }
+		if (isDyrectoryAndNotEmpty === true) {
+			this.processDyrectoryRequest(dyrectory, url_parts.query.file, url_parts.query.time, res);
+		} else {
+			writeNoFile(res);
+		}
+	}
+
+	processRecentsRequest(req, res) {
+		var url_parts = url.parse(req.url, true);
+		var id = url_parts.query.id;
+		var action = url_parts.query.action;
+		if (action === "get") {
+			const db = new DBController();
+			db.getOrAddUser(id).then(function(value) {
+				var result = value.recents;
+				if (result.path !== null) {
+					result.filename = path.basename(result.source);
+				}
+				writeObj(res, result);
+			});
+		}
+		else if (action === "set") {
+			const db = new DBController();
+			console.log("Update: " + id + " [" + url_parts.query.source + "] " + url_parts.query.time);
+			db.updateRecents(id, {path: url_parts.query.path, source: url_parts.query.source, time: url_parts.query.time, timestamp: Date.now()});
+			writeObj(res, "success");
+		}
+		else {
+			console.log("Bad recents action: " + action);
+			writeNoFile(res);
+		}
 	}
 
 	processDyrectoryRequest(dyrectory, file, time, res) {
@@ -86,9 +80,7 @@ class LogicController {
 				var video_content = "";
 				var dirs_content = "";
 				var js_data = "";
-				//console.log("DIRECTORY: " + dyrectory);
 				files.forEach(function (file, index) {
-					//console.log("F " + index + " " + file);
 					if (file != null) {
 						var full_file = path.resolve(dyrectory, file);
 						var extention = path.extname(full_file);
@@ -101,17 +93,18 @@ class LogicController {
 							console.log("WARNING: directory[" + file + "] is empty");
 						}
 						if (extention === ".mp4") {
-							var relative_name = path.relative(root_folder, full_file);
+							var relative_name = path.relative(LogicController.rootFolder(), full_file);
 							relative_name = path.sep + relative_name;
 							video_content += "<p><input type='button' class='video_source' onclick=selectVideoForPlay('" + encodeURI(relative_name) + "') value='" + file + "'></input></p>";
 							js_data += "playlistdata['" + file + "']='" + encodeURI(relative_name) + "';";
 						} else if (isDyrectoryAndNotEmpty) {
-							var relative_name = path.relative(root_folder, full_file);
+							var relative_name = path.relative(LogicController.rootFolder(), full_file);
 							relative_name = path.sep + relative_name;
 							dirs_content += "<li><a href='" + relative_name + "'>" + file + "</a></li>";
 						} else if (extention === ".avi" || extention === ".mkv" || extention === ".wmv") {
-							var converter = new VideoConverter(file, dyrectory);
-							converter.convert();
+							//TODO: disabled while it will be more friendly
+							//var converter = new VideoConverter(file, dyrectory);
+							//converter.convert();
 						} else {
 							console.log("WARNING: can't process -> " + file);
 						}
@@ -134,8 +127,7 @@ class LogicController {
 		});
 	}
 
-	processFileRequest(fileName, req, res) {
-		//console.log("FILE: ", fileName);
+	processFileRequest(fileName, range, res) {
 		fs.stat(fileName, function(err, stats) {
 			if (err) {
 				if (err.code === 'ENOENT') {
@@ -145,7 +137,6 @@ class LogicController {
 				}
 				res.end(err);
 			}
-			var range = req.headers.range;
 			if (!range) {
 				// video page request - not supported
 				writeNoFile(res);
@@ -171,16 +162,6 @@ class LogicController {
 			}).on("error", function(err) {
 				res.end(err);
 			});
-		});
-	}
-
-	processCommonFile(fileName, res) {
-		//console.log("Process common file: " + fileName);
-		var fullFileName = path.resolve("./", fileName);
-		fs.readFile(fullFileName, function (err, html) {
-			res.writeHeader(200, {"Content-Type": "text/html"});
-			res.write(html);
-			res.end();
 		});
 	}
 }
