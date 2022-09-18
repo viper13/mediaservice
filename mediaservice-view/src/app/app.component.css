@@ -1,0 +1,80 @@
+* {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    width: 100%;
+  }
+  header {
+    /* background-color: #666; */
+    text-align: center;
+    font-size: 25px;
+    color: white;
+    max-height: 5%;
+  }
+  nav#globalnavigation {
+    padding: 5px;
+    font-size: 20px;
+    /* background-color: grey; */
+    max-height: 5%;
+  }
+  div#mediacontent {
+    float: left;
+    max-width: 70%;
+    /* background-color: #f32222; */
+  }
+  div#list {
+    float: left;
+    max-width: 30%;
+    /* background: #ccc;  */
+    list-style-type: none;
+    padding: 0;
+    overflow-y: scroll;
+  }
+  div#folderslist {
+    float: left;
+    padding: 20px;
+    width: 100%;
+    /* background-color: #411515; */
+  }
+  video {
+    max-width: 100%;
+  }
+  div#playersection {
+    content: "";
+    display: table;
+    clear: both;
+    max-height: 50px;
+  }
+  footer {
+    padding: 10px;
+    text-align: center;
+    color: white;
+    max-height: 30%;
+    padding: 0;
+    overflow-y:scroll;
+  }
+  input[type=button] {
+    padding:5px; 
+    border:2px solid #ccc; 
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+  }
+  .video_source {
+    white-space: normal;
+  }
+  #video_source_active {
+    color: indigo;
+  }
+  li {
+    font-size: 20px;
+    padding-bottom: 10px;
+  }
+  @media (max-width: 600px) {
+    nav, article {
+      width: 100%;
+      height: auto;
+    }
+  }
+  

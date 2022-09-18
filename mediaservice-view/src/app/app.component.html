@@ -1,0 +1,189 @@
+
+    <header>
+      <p><a href="/">{{ title }}</a></p>
+    </header>
+    <nav id="globalnavigation">
+    <p id="plaing">Plaing: </p>
+    <p id="recent">Last seen: <a id="recent_info" href=""></a></p>
+      <script>
+        var deviceID = "asdasdasdasdasd";
+        var current_video;
+        var prev_video = null;
+        var next_video = null;
+        var play_on_load = null;
+        var time_on_load = null;
+        var last_saved_time = 0;
+        const save_video_state_delta = 30;
+        var playlistdata = new Object();
+        //TODO
+
+        function changeActiveId() {
+          var buttons = document.getElementsByClassName("video_source");
+          Array.prototype.forEach.call(buttons, function(button) {
+            if (playlistdata[button.value] === current_video) {
+              button.setAttribute('id', 'video_source_active');
+            } else {
+              button.setAttribute('id', null);
+            }
+          });
+        }
+
+        function playVideo(isPrev) {
+          if (isPrev) {
+            if (prev_video != null) {
+              selectVideoForPlay(playlistdata[prev_video]);
+            }
+          }
+          if (!isPrev) {
+            if (next_video != null) {
+              selectVideoForPlay(playlistdata[next_video]);
+            }
+          }
+          setTimeout(() => {
+            //RECHECK
+            document.getElementById("list").style.height = document.getElementById("video").clientHeight + "px";
+          }, 1000);
+        }
+        function setActiveNextPrevBtns()
+        {
+          var buttons = document.getElementsByClassName("video_source");
+          var was_found = false;
+          var BreakException = {};
+          prev_video = null;
+          next_video = null;
+          try {
+            Array.prototype.forEach.call(buttons, function(button) {
+              if (was_found) {
+                next_video = button.value;
+                throw BreakException;
+              }
+              if (playlistdata[button.value] === current_video) {
+                was_found = true;
+                button.setAttribute('id', 'video_source_active');
+              }
+              if (!was_found) {
+                prev_video = button.value;
+              }
+            });
+          }
+          catch (e) {
+            if (e !== BreakException) throw e;
+          }
+          document.getElementById("prevBtn").disabled = (prev_video == null);
+          document.getElementById("nextBtn").disabled = (next_video == null);
+        }
+      </script>
+      <input type='button' id="prevBtn" onclick="playVideo(true);" value='Prevoius' />
+      <input type='button' id="nextBtn" onclick="playVideo(false);" value='Next' />
+    </nav>
+    <div id="playersection">
+      <div id="mediacontent">
+        <video id="video" controls>
+        </video>
+        <script>
+          function selectVideoForPlay(source, time = 0, is_from_saved = false) {
+            current_video = source;
+            last_saved_time = time;
+            document.getElementById("plaing").innerHTML = "Plaing: " + decodeURI(source);
+            setActiveNextPrevBtns();
+            changeActiveId();
+            var video = document.getElementById('video');
+            video.src = "/video?src=" + source;
+            video.load();
+            try {
+              video.play();
+            }
+            catch (e) {
+              console.log(e);
+            }
+            {
+              function setTimeForVideo() {
+                this.currentTime = time;
+              }
+              video.removeEventListener('loadedmetadata', setTimeForVideo);
+              if (time > 0) {
+                video.addEventListener('loadedmetadata', setTimeForVideo, false);
+              }
+            }
+            {
+              function updateVideoProgress() {
+                  if(this.currentTime - last_saved_time > save_video_state_delta) {
+                    last_saved_time = this.currentTime;
+                    const path = "/recents?action=set&id=" + deviceID + "&path=" + window.location.pathname + "&source=" + current_video + "&time=" + last_saved_time;
+                    fetch(path);
+                  }
+              }
+              video.removeEventListener('timeupdate', updateVideoProgress);
+              video.addEventListener("timeupdate", updateVideoProgress);
+            }
+
+            if (is_from_saved === false) {
+              const path = "/recents?action=set&id=" + deviceID + "&path=" + window.location.pathname + "&source=" + current_video + "&time=" + last_saved_time;
+              fetch(path);
+            }
+          }
+
+// TODO: (click)="selectVideoForPlay(encodeURI('{{item.src}}'))
+
+        </script>
+      </div>
+      <app-video-item-list></app-video-item-list>
+    </div>
+    <div id="folderslist"><!--_______FOLDERS_LIST____________--></div>
+    <!--<footer>TODO</footer>-->
+  <script> 
+    var videolists = document.getElementsByClassName("video_source");
+    if (videolists.length === 0) {
+      document.getElementById("playersection").style.display = "none";
+      document.getElementById("globalnavigation").style.display = "none";
+    }
+  
+    var supportsOrientationChange = "onorientationchange" in window,
+    orientationEvent = supportsOrientationChange ? "orientationchange" : "resize";
+    window.addEventListener(orientationEvent, function() {
+      if (window.orientation === 90 || window.orientation === -90)
+      {
+        var elem = document.getElementById("video");
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+          elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) {
+          elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) { 
+          elem.msRequestFullscreen();
+        }     
+      } else {
+        // TODO: currently not working
+        // alert('HOLY ROTATING SCREENS BATMAN:' + window.orientation + " " + screen.width);
+        // if (document.exitFullscreen) {
+        //   document.exitFullscreen();
+        // }
+      }
+    }, false);
+    document.getElementById("video").addEventListener('ended', function() {
+      playVideo(false);
+    }, false);
+    function onLoadedLogic() {
+      const path = "/recents?action=get&id=" + deviceID;
+      fetch(path)
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        //TODO: write a visualisation logic
+        if (data.path === null) {
+          document.getElementById("recent").style.display = "none";
+        } else {
+          var link = document.getElementById("recent_info");
+          link.href = encodeURI(data.path + "?file=" + data.filename + "&time=" + data.time);
+          link.innerHTML = data.source;
+        }
+        console.log(data);
+      });
+      if (play_on_load) {
+        selectVideoForPlay(playlistdata[play_on_load], time_on_load, true);
+      }
+    }
+    setTimeout(onLoadedLogic, 1000);
+    </script>

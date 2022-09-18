@@ -1,0 +1,8 @@
+<div id="list">
+    <p *ngFor="let video of videoItems">
+        <button type='button' class='video_source' (click)="onSelect(video)">
+            <span class="badge">{{video.id}}</span>
+            <span class="name">{{video.file}}</span>
+        </button>
+    </p>
+</div>

@@ -46,6 +46,9 @@ class LogicController {
 	}
 
 	processRecentsRequest(req, res) {
+		writeObj(res, "success");
+		return;
+		//TODO: recheck it
 		var url_parts = url.parse(req.url, true);
 		var id = url_parts.query.id;
 		var action = url_parts.query.action;
