@@ -14,7 +14,7 @@
     <p id="plaing">Plaing: </p>
     <p id="recent">Last seen: <a id="recent_info" href=""></a></p>
       <script>
-        var deviceID = new DeviceUUID().get();;
+        var deviceID = "PartialyWorks";
         var current_video;
         var prev_video = null;
         var next_video = null;
@@ -51,34 +51,6 @@
             document.getElementById("list").style.height = document.getElementById("video").clientHeight + "px";
           }, 1000);
         }
-        function setActiveNextPrevBtns()
-        {
-          var buttons = document.getElementsByClassName("video_source");
-          var was_found = false;
-          var BreakException = {};
-          prev_video = null;
-          next_video = null;
-          try {
-            Array.prototype.forEach.call(buttons, function(button) {
-              if (was_found) {
-                next_video = button.value;
-                throw BreakException;
-              }
-              if (playlistdata[button.value] === current_video) {
-                was_found = true;
-                button.setAttribute('id', 'video_source_active');
-              }
-              if (!was_found) {
-                prev_video = button.value;
-              }
-            });
-          }
-          catch (e) {
-            if (e !== BreakException) throw e;
-          }
-          document.getElementById("prevBtn").disabled = (prev_video == null);
-          document.getElementById("nextBtn").disabled = (next_video == null);
-        }
       </script>
       <input type='button' id="prevBtn" onclick="playVideo(true)" value='Prevoius'></input>
       <input type='button' id="nextBtn" onclick="playVideo(false)" value='Next'></input>
@@ -89,6 +61,34 @@
         <video id="video" controls>
         </video>
         <script>
+          function setActiveNextPrevBtns()
+          {
+            var buttons = document.getElementsByClassName("video_source");
+            var was_found = false;
+            var BreakException = {};
+            prev_video = null;
+            next_video = null;
+            try {
+              Array.prototype.forEach.call(buttons, function(button) {
+                if (was_found) {
+                  next_video = button.value;
+                  throw BreakException;
+                }
+                if (playlistdata[button.value] === current_video) {
+                  was_found = true;
+                  button.setAttribute('id', 'video_source_active');
+                }
+                if (!was_found) {
+                  prev_video = button.value;
+                }
+              });
+            }
+            catch (e) {
+              if (e !== BreakException) throw e;
+            }
+            document.getElementById("prevBtn").disabled = (prev_video == null);
+            document.getElementById("nextBtn").disabled = (next_video == null);
+          }
           function selectVideoForPlay(source, time = 0, is_from_saved = false) {
             current_video = source;
             last_saved_time = time;

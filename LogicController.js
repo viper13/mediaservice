@@ -95,12 +95,12 @@ class LogicController {
 						if (extention === ".mp4") {
 							var relative_name = path.relative(LogicController.rootFolder(), full_file);
 							relative_name = path.sep + relative_name;
-							video_content += "<p><input type='button' class='video_source' onclick=selectVideoForPlay('" + encodeURI(relative_name) + "') value='" + file + "'></input></p>";
-							js_data += "playlistdata['" + file + "']='" + encodeURI(relative_name) + "';";
+							video_content += "<p><input type='button' class='video_source' onclick=selectVideoForPlay(\"" + encodeURI(relative_name) + "\") value=\"" + file + "\"></input></p>";
+							js_data += "playlistdata[\"" + file + "\"]=\"" + encodeURI(relative_name) + "\";";
 						} else if (isDyrectoryAndNotEmpty) {
 							var relative_name = path.relative(LogicController.rootFolder(), full_file);
 							relative_name = path.sep + relative_name;
-							dirs_content += "<li><a href='" + relative_name + "'>" + file + "</a></li>";
+							dirs_content += "<li><a href=\"" + encodeURI(relative_name) + "\">" + file + "</a></li>";
 						} else if (extention === ".avi" || extention === ".mkv" || extention === ".wmv") {
 							//TODO: disabled while it will be more friendly
 							//var converter = new VideoConverter(file, dyrectory);
@@ -111,7 +111,7 @@ class LogicController {
 					}
 				});
 				if (file !== null) {
-					js_data += "play_on_load='" + file + "';";
+					js_data += "play_on_load=\"" + file + "\";";
 				}
 				if (time !== null) {
 					js_data += "time_on_load=" + time + ";";
