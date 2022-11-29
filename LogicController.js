@@ -86,8 +86,10 @@ class LogicController {
 						var full_file = path.resolve(dyrectory, file);
 						var extention = path.extname(full_file);
 						var isDyrectoryAndNotEmpty = false;
+						var size = 0;
 						try {
 							const fileStat = fs.statSync(full_file);
+							size = fileStat.size / (1024*1024*1024);
 							isDyrectoryAndNotEmpty = fileStat.isDirectory();
 						}
 						catch {
@@ -96,7 +98,8 @@ class LogicController {
 						var relative_name = path.relative(LogicController.rootFolder(), full_file);
 						relative_name = path.sep + relative_name;
 						if (extention === ".mp4") {
-							video_content += "<p><input type='button' class='video_source' onclick=selectVideoForPlay(\"" + encodeURI(relative_name) + "\") value=\"" + file + "\"></input><a href=download?src=" + encodeURI(relative_name) + ">DOW<\a></p>";
+							video_content += "<p><input type='button' class='video_source' onclick=selectVideoForPlay(\"" + encodeURI(relative_name) + "\") value=\"" + file + "\"></input></p>";
+							dirs_content_other_files += "<li><a href=download?src=" + encodeURI(relative_name) + ">" + file + "</a></li>";
 							js_data += "playlistdata[\"" + file + "\"]=\"" + encodeURI(relative_name) + "\";";
 						} else if (isDyrectoryAndNotEmpty) {
 							dirs_content += "<li><a href=\"" + encodeURI(relative_name) + "\">" + file + "</a></li>";
@@ -105,7 +108,7 @@ class LogicController {
 							//var converter = new VideoConverter(file, dyrectory);
 							//converter.convert();
 						} else {
-							dirs_content_other_files += "<li><a href=download?src=" + encodeURI(relative_name) + ">" + file + "</a></li>";
+							dirs_content_other_files += "<li><a href=download?src=" + encodeURI(relative_name) + ">" + file + "</a>->" + size.toFixed(2) + "GB</li>";
 							console.log("WARNING: can't process -> " + file);
 						}
 					}
