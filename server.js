@@ -26,6 +26,12 @@ app.get('/video', function (req, res) {
 	logic.processFileRequest(file, req.headers.range, res);
 });
 
+app.get('/download', function(req, res){
+	var logic = new LogicController;
+	var url_parts = url.parse(req.url, true);
+	logic.downloadFile(url_parts.query.src, res);
+});
+
 app.get('/recents', function (req, res) {
 	var logic = new LogicController;
 	logic.processRecentsRequest(req, res);

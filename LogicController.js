@@ -79,6 +79,7 @@ class LogicController {
 			fs.readdir(dyrectory, function (err, files) {
 				var video_content = "";
 				var dirs_content = "";
+				var dirs_content_other_files = "";
 				var js_data = "";
 				files.forEach(function (file, index) {
 					if (file != null) {
@@ -92,20 +93,19 @@ class LogicController {
 						catch {
 							console.log("WARNING: directory[" + file + "] is empty");
 						}
+						var relative_name = path.relative(LogicController.rootFolder(), full_file);
+						relative_name = path.sep + relative_name;
 						if (extention === ".mp4") {
-							var relative_name = path.relative(LogicController.rootFolder(), full_file);
-							relative_name = path.sep + relative_name;
-							video_content += "<p><input type='button' class='video_source' onclick=selectVideoForPlay(\"" + encodeURI(relative_name) + "\") value=\"" + file + "\"></input></p>";
+							video_content += "<p><input type='button' class='video_source' onclick=selectVideoForPlay(\"" + encodeURI(relative_name) + "\") value=\"" + file + "\"></input><a href=download?src=" + encodeURI(relative_name) + ">DOW<\a></p>";
 							js_data += "playlistdata[\"" + file + "\"]=\"" + encodeURI(relative_name) + "\";";
 						} else if (isDyrectoryAndNotEmpty) {
-							var relative_name = path.relative(LogicController.rootFolder(), full_file);
-							relative_name = path.sep + relative_name;
 							dirs_content += "<li><a href=\"" + encodeURI(relative_name) + "\">" + file + "</a></li>";
-						} else if (extention === ".avi" || extention === ".mkv" || extention === ".wmv") {
+						//} else if (extention === ".avi" || extention === ".mkv" || extention === ".wmv") {
 							//TODO: disabled while it will be more friendly
 							//var converter = new VideoConverter(file, dyrectory);
 							//converter.convert();
 						} else {
+							dirs_content_other_files += "<li><a href=download?src=" + encodeURI(relative_name) + ">" + file + "</a></li>";
 							console.log("WARNING: can't process -> " + file);
 						}
 					}
@@ -119,6 +119,7 @@ class LogicController {
 				var file_data = html.toString();
 				res.writeHeader(200, {"Content-Type": "text/html"});
 				file_data = file_data.replace(replace_vid1_str, video_content);
+				dirs_content += dirs_content_other_files;
 				file_data = file_data.replace(replace_dir_list_str, dirs_content);
 				file_data = file_data.replace(replace_js_data_str, js_data);
 				res.write(file_data);
@@ -162,6 +163,23 @@ class LogicController {
 			}).on("error", function(err) {
 				res.end(err);
 			});
+		});
+	}
+
+	downloadFile(file, res)
+	{
+		file = LogicController.rootFolder() + path.sep + file;
+		fs.stat(file, function(err, stats) {
+			if (err) {
+				if (err.code === 'ENOENT') {
+					// 404 Error if file not found
+					writeNoFile(res);
+					return;
+				}
+				res.end(err);
+			}
+
+			res.download(file);
 		});
 	}
 }
