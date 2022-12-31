@@ -169,8 +169,7 @@ class LogicController {
 		});
 	}
 
-	downloadFile(file, res)
-	{
+	downloadFile(file, res) {
 		file = LogicController.rootFolder() + path.sep + file;
 		fs.stat(file, function(err, stats) {
 			if (err) {
@@ -183,6 +182,43 @@ class LogicController {
 			}
 
 			res.download(file);
+		});
+	}
+
+	dataRequest(req, res) {
+		const directory = path.resolve(LogicController.rootFolder());
+		fs.readdir(directory, function (err, files) {
+			var responseData = {files: []};
+			files.forEach(function (file) {
+				if (file != null) {
+					var full_file = path.resolve(directory, file);
+					var extention = path.extname(full_file);
+					var isDirectoryAndNotEmpty = false;
+					var size = 0;
+					try {
+						const fileStat = fs.statSync(full_file);
+						size = fileStat.size / (1024*1024*1024);
+						isDirectoryAndNotEmpty = fileStat.isDirectory();
+					}
+					catch {
+						console.log("WARNING: directory[" + file + "] is empty");
+					}
+					var relative_name = path.relative(LogicController.rootFolder(), full_file);
+					relative_name = path.sep + relative_name;
+					const value = {
+						name: file,
+						relativeName: encodeURI(relative_name),
+						isVideo: (extention === ".mp4"),
+						isDirectory: isDirectoryAndNotEmpty,
+						size: size.toFixed(2)
+					};
+					responseData.files.push(value);
+				}
+			});
+
+			const jsonContent = JSON.stringify(responseData);
+  			res.end(jsonContent);
+			res.end();
 		});
 	}
 }

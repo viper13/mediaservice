@@ -30,11 +30,17 @@ app.get('/download', function(req, res){
 	var logic = new LogicController;
 	var url_parts = url.parse(req.url, true);
 	logic.downloadFile(url_parts.query.src, res);
+	res.download(file);
 });
 
 app.get('/recents', function (req, res) {
 	var logic = new LogicController;
 	logic.processRecentsRequest(req, res);
+});
+
+app.get('/data', function (req, res) {
+	var logic = new LogicController;
+	logic.dataRequest(req, res);
 });
 
 app.all('*', function (req, res) {
