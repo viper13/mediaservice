@@ -10,11 +10,11 @@ var http = require("http"),
 var app = express();
 http.createServer(app).listen(PORT);
 
-app.get('/', function (req, res) {
-	var logic = new LogicController;
-	logic.processRootRequest(res);
-});
-
+//app.get('/', function (req, res) {
+//	var logic = new LogicController;
+//	logic.processRootRequest(res);
+//});
+app.use("/", express.static("./mediaserviceview/build"));
 app.use(favicon('./favicon.ico'));
 
 app.use("/frontjs", express.static("./frontjs"));
@@ -43,7 +43,7 @@ app.get('/data', function (req, res) {
 	logic.dataRequest(req, res);
 });
 
-app.all('*', function (req, res) {
-	var logic = new LogicController;
-	logic.processRequest(req, res);
-});
+//app.all('*', function (req, res) {
+//	var logic = new LogicController;
+//	logic.processRequest(req, res);
+//});

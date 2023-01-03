@@ -1,5 +1,5 @@
 import './App.css';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 function Header(props)  {
   return (
@@ -13,8 +13,8 @@ function NavigationBar(props)  {
     <div id="globalnavigation">
       <p id="plaing">Plaing: </p>
       <p id="recent">Last seen: <a id="recent_info" href="/TODO"></a></p>
-        <input type='button' id="prevBtn" onclick={() => this.setState({value: 'X'})} value='Prevoius'></input>
-        <input type='button' id="nextBtn" onclick={() => this.setState({value: 'X'})} value='Next'></input>
+        <input type='button' id="prevBtn" onClick={() => this.setState({value: 'X'})} value='Prevoius'></input>
+        <input type='button' id="nextBtn" onClick={() => this.setState({value: 'X'})} value='Next'></input>
     </div>);
 }
 
@@ -31,9 +31,9 @@ function playMe() {
 
 function VideoList(props) {
   return (<div id="list">
-    <p><input type='button' class='video_source' onclick={() => playMe()}></input></p>
-    <p><input type='button' class='video_source' onclick={() => playMe()}></input></p>
-    <p><input type='button' class='video_source' onclick={() => playMe()}></input></p>
+    <p><input type='button' onClick={() => playMe()}></input></p>
+    <p><input type='button' onClick={() => playMe()}></input></p>
+    <p><input type='button' onClick={() => playMe()}></input></p>
   </div>);
 }
 
@@ -48,9 +48,7 @@ function PlayerSection(props)  {
 function FoldersList(props) {
   return (
     <div id="foldersList">
-      <p>Folder 1</p>
-      <p>Folder 2</p>
-      <p>Folder 3</p>
+      {Array.isArray(props.files) ? props.files.map(value => { return value.isDirectory ? <p>{value.name}</p> : '' }) : 'wait...'}
     </div>
   );
 }
@@ -58,21 +56,32 @@ function FoldersList(props) {
 function DownloadsList(props) {
   return (
     <div id="downloadsList">
-      <p>File 1</p>
-      <p>File 2</p>
-      <p>File 3</p>
+      {Array.isArray(props.files) ? props.files.map(value => { return value.isDirectory ? '' : <p>{value.name}</p> }) : 'wait...'}
     </div>
   );
 }
 
 function App() {
+  const [files, setFiles] = useState(0);
+
+  useEffect(() => {
+    const dataFetch = async () => {
+      const data = await (
+        await fetch(
+          "/data"
+        )
+      ).json();
+      setFiles(data.files);
+    }
+    dataFetch();
+  });
   return (
     <div className="App">
       <Header />
       <NavigationBar />
-      <PlayerSection />
-      <FoldersList />
-      <DownloadsList />
+      <PlayerSection files={files} />
+      <FoldersList files={files} />
+      <DownloadsList files={files} />
     </div>
   );
 }
