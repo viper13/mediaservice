@@ -8,3 +8,20 @@ div#folderslist {
   width: 100%;
   background-color: #411515;
 }
+
+video {
+  max-width: 50%;
+}
+
+div#playersection {
+  content: "";
+  display: table;
+  clear: both;
+  max-height: 50px;
+}
+
+div#list {
+  max-width: 30%;
+  background: #ccc;
+  padding: 0;
+}

@@ -185,8 +185,21 @@ class LogicController {
 		});
 	}
 
-	dataRequest(req, res) {
-		const directory = path.resolve(LogicController.rootFolder());
+	dataRequest(dir, res) {
+		const directory = path.resolve(LogicController.rootFolder(), "." + decodeURI(dir));
+		var isDirectoryAndNotEmpty = false;
+		try {
+			const fileStat = fs.statSync(directory);
+			isDirectoryAndNotEmpty = fileStat.isDirectory();
+		}
+		catch {
+			console.log("WARNING: directory[" + directory + "] is empty");
+		}
+		if (!isDirectoryAndNotEmpty) {
+			writeNoFile(res);
+			return;
+		}
+
 		fs.readdir(directory, function (err, files) {
 			var responseData = {files: []};
 			files.forEach(function (file) {

@@ -10,14 +10,8 @@ var http = require("http"),
 var app = express();
 http.createServer(app).listen(PORT);
 
-//app.get('/', function (req, res) {
-//	var logic = new LogicController;
-//	logic.processRootRequest(res);
-//});
 app.use("/", express.static("./mediaserviceview/build"));
 app.use(favicon('./favicon.ico'));
-
-app.use("/frontjs", express.static("./frontjs"));
 
 app.get('/video', function (req, res) {
 	var logic = new LogicController;
@@ -39,10 +33,12 @@ app.get('/recents', function (req, res) {
 
 app.get('/data', function (req, res) {
 	var logic = new LogicController;
-	logic.dataRequest(req, res);
+	var url_parts = url.parse(req.url, true);
+	logic.dataRequest(url_parts.query.path, res);
 });
 
-//app.all('*', function (req, res) {
-//	var logic = new LogicController;
-//	logic.processRequest(req, res);
-//});
+app.all('*', function (req, res) {
+	res.writeHeader(404, {"Content-Type": "text/html"});  
+	res.write("No file.");
+	res.end();
+});
