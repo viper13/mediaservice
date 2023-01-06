@@ -1,5 +1,9 @@
 import './App.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+
+function LoadingItem(props) {
+  return <p>waiting....</p>;
+}
 
 function Header(props)  {
   return (
@@ -9,8 +13,27 @@ function Header(props)  {
 }
 
 function NavigationBar(props)  {
+  const [detailedLocation, setDetailedLocation] = useState(0);
+
+  function clickHandler(value) {
+    console.log("Click to location: " + value.name);
+    props.setPath(value.relativeName);
+  }
+
+  useEffect(() => {
+    console.log("Fetch location: " + props.path);
+    const dataFetch = async () => {
+      const data = await (await fetch("/explainPath?path=" + encodeURI(props.path))).json();
+      setDetailedLocation(data.directories);
+    };
+
+    dataFetch();
+  }, [props.path]);
   return (
     <div id="globalnavigation">
+      <p id="location">Location: {Array.isArray(detailedLocation) ? detailedLocation.map(value => {
+            return <input type='button' onClick={() => clickHandler(value)} value={value.name} />;
+          }) : ''}</p>
       <p id="plaing">Plaing: {props.video.name}</p>
       <p id="recent">Last seen: <a id="recent_info" href="/TODO"></a></p>
         <input type='button' id="prevBtn" onClick={() => this.setState({value: 'X'})} value='Prevoius'></input>
@@ -19,51 +42,68 @@ function NavigationBar(props)  {
 }
 
 function VideoPlayer(props)  {
+  const videoPlayer = useRef(null);
   useEffect(() => {
     console.log("Video changed: " + props.video.file)
     if (!props.video.file)
       return;
-    var video = document.getElementById('video');
+    var video = videoPlayer.current;
     video.src = "/video?src=" + props.video.file;
     video.load();
-    video.play();
+    video.play().catch(function(error) {
+      console.log("Looks like user have not interact with document.");
+    });
   }, [props.video])
 
   return (<div id="mediacontent">
-    <video id="video" controls>
+    <video id="video" ref={videoPlayer} controls>
       </video>
   </div>);
 }
 
 function VideoList(props) {
-  return (<div id="list">
-    {Array.isArray(props.files) ? props.files.map(value => {
-        return value.isVideo ? <p><input type='button' onClick={() => {
-          props.setVideo({file: value.relativeName, name:value.name});
-        }} value={value.name} /></p> : '';
-      }) : 'wait...'}
-  </div>);
+  function clickHandler(value) {
+    console.log("Click to video: " + value.name);
+    props.setVideo({file: value.relativeName, name:value.name});
+  }
+
+  if (Array.isArray(props.files)) {
+    return (<div id="list">
+        {props.files.map(value => {
+            return value.isVideo ? <p><input type='button' onClick={() => clickHandler(value)} value={value.name} /></p> : '';
+          })}
+      </div>);
+  } else {
+    return <LoadingItem />;
+  }
 }
 
 function PlayerSection(props)  {
   return (
     <div id="playersection">
-      <NavigationBar video={props.video} />
+      <NavigationBar video={props.video} path={props.path} setPath={props.setPath}/>
       <VideoPlayer video={props.video} /> 
       <VideoList files={props.files} video={props.video} setVideo={props.setVideo} />
     </div>);
 }
 
 function FoldersList(props) {
-  return (
-    <div id="foldersList">
-      {Array.isArray(props.files) ? props.files.map(value => { 
-          return value.isDirectory ? <p><input type='button' onClick={() => {
-            props.setPath(value.relativeName);
-          }} value={value.name} /></p> : '' 
-        }) : 'wait...'}
-    </div>
-  );
+  function clickHandler(value) {
+    console.log("Click to folder: " + value.name);
+    props.setPath(value.relativeName);
+  }
+  if (Array.isArray(props.files)) {
+    return (
+      <div id="foldersList">
+        { props.files.map(value => { 
+          return value.isDirectory ? 
+                <p><input type='button' onClick={() => clickHandler(value)} value={value.name} /></p> 
+                : ''
+        })}
+    </div>);
+  } else {
+    return <LoadingItem />;
+  }
 }
 
 function DownloadsListItem(props) {
@@ -71,13 +111,18 @@ function DownloadsListItem(props) {
 }
 
 function DownloadsList(props) {
-  return (
-    <div id="downloadsList">
-      {Array.isArray(props.files) ? props.files.map(value => {
-        return value.isDirectory ? '' : <DownloadsListItem file={value.relativeName} name={value.name}/> ;
-        }) : 'wait...'}
-    </div>
-  );
+  if (Array.isArray(props.files)) {
+      return (
+      <div id="downloadsList">
+        { props.files.map(value => {
+          return value.isDirectory ? 
+                  '' 
+                  : <DownloadsListItem file={value.relativeName} name={value.name}/> ;
+          }) }
+      </div> );
+  } else {
+    return <LoadingItem />;
+  }
 }
 
 function App() {
@@ -85,22 +130,21 @@ function App() {
   const [video, setVideo] = useState(0);
   const [path, setPath] = useState('/')
 
-  const dataFetch = async () => {
-    const data = await (await fetch("/data?path=" + path)).json();
-    setFiles(data.files);
-  }
-
-  useEffect(() => {
-    dataFetch();
-  });
   useEffect(() => {
     console.log("Path updated: " + path);
+
+    const dataFetch = async () => {
+      const data = await (await fetch("/data?path=" + encodeURI(path))).json();
+      setFiles(data.files);
+    }
+
     dataFetch();
   }, [path]);
+
   return (
     <div className="App">
       <Header />
-      <PlayerSection files={files} video={video} setVideo={setVideo} />
+      <PlayerSection files={files} video={video} setVideo={setVideo} path={path} setPath={setPath} />
       <FoldersList files={files} path={path} setPath={setPath}/>
       <DownloadsList files={files} />
     </div>

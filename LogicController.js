@@ -231,8 +231,29 @@ class LogicController {
 
 			const jsonContent = JSON.stringify(responseData);
   			res.end(jsonContent);
-			res.end();
+			res.end(); // check it
 		});
+	}
+
+	explainPathRequest(fullPath, res) {
+		const normalizedPath = path.normalize(decodeURI(fullPath));
+		console.log("Normalized: " + normalizedPath);
+		const dirs = normalizedPath.split(path.sep);
+		console.log("Splited: " + dirs);
+		var responseData = {directories: []};
+		var incPath = '';
+
+		dirs.forEach(function (dir) {
+			incPath += dir + path.sep;
+			if (dir === '') {
+				dir = 'root'
+			}
+			responseData.directories.push({name: dir, relativeName: encodeURI(incPath)});
+		});
+
+		const jsonContent = JSON.stringify(responseData);
+		res.end(jsonContent);
+		res.end(); // check it
 	}
 }
 

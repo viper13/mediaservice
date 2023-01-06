@@ -37,6 +37,12 @@ app.get('/data', function (req, res) {
 	logic.dataRequest(url_parts.query.path, res);
 });
 
+app.get('/explainPath', function (req, res) {
+	var logic = new LogicController;
+	var url_parts = url.parse(req.url, true);
+	logic.explainPathRequest(url_parts.query.path, res);
+});
+
 app.all('*', function (req, res) {
 	res.writeHeader(404, {"Content-Type": "text/html"});  
 	res.write("No file.");
