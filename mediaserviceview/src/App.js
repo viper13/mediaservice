@@ -7,9 +7,9 @@ function LoadingItem(props) {
 
 function Header(props)  {
   return (
-    <header>
-      <p><a href="/">Home video player</a></p>
-    </header>);
+    <div id="header">
+      <div class="center"><p><a href="/">Home video player</a></p></div>
+    </div>);
 }
 
 function NavigationBar(props)  {
@@ -30,10 +30,11 @@ function NavigationBar(props)  {
     dataFetch();
   }, [props.path]);
   return (
-    <div id="globalnavigation">
-      <p id="location">Location: {Array.isArray(detailedLocation) ? detailedLocation.map(value => {
+    <div id="navigationBar">
+      <p id="location">{Array.isArray(detailedLocation) ? detailedLocation.map(value => {
             return <input type='button' onClick={() => clickHandler(value)} value={value.name} />;
           }) : ''}</p>
+
       <p id="plaing">Plaing: {props.video.name}</p>
       <p id="recent">Last seen: <a id="recent_info" href="/TODO"></a></p>
         <input type='button' id="prevBtn" onClick={() => this.setState({value: 'X'})} value='Prevoius'></input>
@@ -55,7 +56,7 @@ function VideoPlayer(props)  {
     });
   }, [props.video])
 
-  return (<div id="mediacontent">
+  return (<div id="videoPlayer">
     <video id="video" ref={videoPlayer} controls>
       </video>
   </div>);
@@ -68,10 +69,12 @@ function VideoList(props) {
   }
 
   if (Array.isArray(props.files)) {
-    return (<div id="list">
+    return (<div id="videoList">
         {props.files.map(value => {
-            return value.isVideo ? <p><input type='button' onClick={() => clickHandler(value)} value={value.name} /></p> : '';
-          })}
+          if (value.isVideo) {
+            return <p class="videoListItem"><input type='button' onClick={() => clickHandler(value)} value={value.name} /></p>;
+          }
+        })}
       </div>);
   } else {
     return <LoadingItem />;
@@ -80,10 +83,12 @@ function VideoList(props) {
 
 function PlayerSection(props)  {
   return (
-    <div id="playersection">
+    <div id="playerSection">
       <NavigationBar video={props.video} path={props.path} setPath={props.setPath}/>
-      <VideoPlayer video={props.video} /> 
-      <VideoList files={props.files} video={props.video} setVideo={props.setVideo} />
+      <div id="videoContent">
+        <VideoPlayer video={props.video} />
+        <VideoList files={props.files} video={props.video} setVideo={props.setVideo} />
+      </div>
     </div>);
 }
 
@@ -97,7 +102,7 @@ function FoldersList(props) {
       <div id="foldersList">
         { props.files.map(value => { 
           return value.isDirectory ? 
-                <p><input type='button' onClick={() => clickHandler(value)} value={value.name} /></p> 
+                <p class="foldersListItem"><input type='button' onClick={() => clickHandler(value)} value={value.name} /></p> 
                 : ''
         })}
     </div>);
@@ -107,7 +112,7 @@ function FoldersList(props) {
 }
 
 function DownloadsListItem(props) {
-  return (<p><a href={"download?src=" + props.file} >{props.name}</a></p>);
+  return (<p class="downloadsListItem"><a href={"download?src=" + props.file} >{props.name}</a></p>);
 }
 
 function DownloadsList(props) {
@@ -123,6 +128,10 @@ function DownloadsList(props) {
   } else {
     return <LoadingItem />;
   }
+}
+
+function Footer(props) {
+  return (<div id="footer"><p>Private home video player.</p></div>);
 }
 
 function App() {
@@ -147,6 +156,7 @@ function App() {
       <PlayerSection files={files} video={video} setVideo={setVideo} path={path} setPath={setPath} />
       <FoldersList files={files} path={path} setPath={setPath}/>
       <DownloadsList files={files} />
+      <Footer />
     </div>
   );
 }
