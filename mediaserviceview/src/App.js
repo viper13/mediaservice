@@ -5,11 +5,59 @@ function LoadingItem(props) {
   return <p>waiting....</p>;
 }
 
-function Header(props)  {
+function Header(props) {
   return (
     <div id="header">
       <div class="center"><p><a href="/">Home video player</a></p></div>
     </div>);
+}
+
+function PrevNextControls(props) {
+  const [prevoius, setPrevoius] = useState({});
+  const [next, setNext] = useState({});
+
+  useEffect(() => {
+    if (!props.video.file || !props.files)
+      return;
+    var prev = {};
+    var plusOne = {};
+    var isVideoFound;
+    isVideoFound = false;
+    for (const value of props.files) {
+      if (!value.isVideo) {
+        continue;
+      }
+      if (Object.keys(plusOne).length !== 0) {
+        continue;
+      }
+      if (isVideoFound) {
+        plusOne = {file: value.relativeName, name:value.name};
+        continue;
+      }
+      if (value.name === props.video.name) {
+        isVideoFound = true;
+      } else {
+        prev = {file: value.relativeName, name:value.name};
+      }
+    }
+    if (!isVideoFound) {
+      setPrevoius({});
+    }
+    setPrevoius(prev);
+    setNext(plusOne);
+  }, [props.video, props.files]);
+
+  function clickHandler(isNext) {
+    if (isNext) {
+      props.setVideo({file: next.file, name: next.name});
+    } else {
+      props.setVideo({file: prevoius.file, name: prevoius.name});
+    }
+  }
+
+  return (<p id="prevNextControls">
+    <input type='button' id="prevBtn" onClick={() => clickHandler(false)} value='Prevoius' disabled={!prevoius.file}></input>
+    <input type='button' id="nextBtn" onClick={() => clickHandler(true)} value='Next' disabled={!next.file}></input></p>);
 }
 
 function NavigationBar(props)  {
@@ -37,8 +85,7 @@ function NavigationBar(props)  {
 
       <p id="plaing">Plaing: {props.video.name}</p>
       <p id="recent">Last seen: <a id="recent_info" href="/TODO"></a></p>
-        <input type='button' id="prevBtn" onClick={() => this.setState({value: 'X'})} value='Prevoius'></input>
-        <input type='button' id="nextBtn" onClick={() => this.setState({value: 'X'})} value='Next'></input>
+      <PrevNextControls video={props.video} setVideo={props.setVideo} files={props.files}/>
     </div>);
 }
 
@@ -84,7 +131,7 @@ function VideoList(props) {
 function PlayerSection(props)  {
   return (
     <div id="playerSection">
-      <NavigationBar video={props.video} path={props.path} setPath={props.setPath}/>
+      <NavigationBar video={props.video} setVideo={props.setVideo} path={props.path} setPath={props.setPath} files={props.files}/>
       <div id="videoContent">
         <VideoPlayer video={props.video} />
         <VideoList files={props.files} video={props.video} setVideo={props.setVideo} />
