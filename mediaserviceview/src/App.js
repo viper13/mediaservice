@@ -15,8 +15,10 @@ function Header(props) {
 function PrevoiusButton(props) {
   const [prevoius, setPrevoius] = useState({});
   useEffect(() => {
-    if (!props.video.file || !props.files)
+    if (!props.video.file || !props.files) {
+      setPrevoius({});
       return;
+    }
     var prev = {};
     var isVideoFound;
     isVideoFound = false;
@@ -32,6 +34,8 @@ function PrevoiusButton(props) {
     }
     if (isVideoFound) {
       setPrevoius(prev);
+    } else {
+      setPrevoius({});
     }
   }, [props.video, props.files]);
 
@@ -45,8 +49,10 @@ function PrevoiusButton(props) {
 function NextButton(props) {
   const [next, setNext] = useState({});
   useEffect(() => {
-    if (!props.video.file || !props.files)
+    if (!props.video.file || !props.files) {
+      setNext({});
       return;
+    }
     var plusOne = {};// next
     var isVideoFound;
     isVideoFound = false;
