@@ -1,6 +1,8 @@
 import './App.css';
 import React, { useState, useEffect, useRef } from 'react';
 import FileDownloadImage from './images/file-download.png';
+import PlayImage from './images/play.png';
+import PlayingImage from './images/video-playing.png';
 
 function LoadingItem(props) {
   return <p>waiting....</p>;
@@ -126,17 +128,31 @@ function VideoPlayer(props)  {
   </div>);
 }
 
-function VideoList(props) {
-  function clickHandler(value) {
-    console.log("Click to video: " + value.name);
-    props.setVideo({file: value.relativeName, name:value.name});
-  }
+function VideoListItem(props) {
+  const [isPlaying, setPlaying] = useState(false);
 
+  useEffect(() => {
+    setPlaying(props.video.name === props.value.name);
+  }, [props.video, props.value])
+
+  function clickHandler(value) {
+    if (!isPlaying) {
+      console.log("Click to video: " + value.name);
+      props.setVideo({file: value.relativeName, name:value.name});
+    } else {
+      console.log("Video is already playing: " + value.name);
+    }
+  }
+  return (<p><p class={isPlaying ? "videoListItemActive" : "videoListItem"} onClick={() => clickHandler(props.value)}>
+    <img class="videoListItem" src={isPlaying ? PlayingImage : PlayImage}/>{props.value.name}</p></p>);
+}
+
+function VideoList(props) {
   if (Array.isArray(props.files)) {
     return (<div id="videoList">
         {props.files.map(value => {
           if (value.isVideo) {
-            return <input class="videoListItem" type='button' onClick={() => clickHandler(value)} value={value.name} />;
+            return <VideoListItem value={value} video={props.video} setVideo={props.setVideo}/>;
           } else {
             return '';
           }

@@ -58,16 +58,48 @@ div#videoPlayer {
   flex: initial;
 }
 
-input.videoListItem {
+p.videoListItem {
   box-sizing: border-box;
   width: 100%;
   padding: 2px;
   height: 2em;
   margin: 5px auto;
   border: none; /* <-- This thing here */
-  border:solid 2px #ccc;
+  border: solid 2px #ccc;
   border-radius: 5px;
   overflow: hidden;
+  display:inline-block;
+}
+
+p.videoListItem:hover {
+  cursor: pointer;
+  background-color: green;
+  color: white;
+}
+
+p.videoListItemActive {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 2px;
+  height: 2em;
+  margin: 5px auto;
+  border: none; /* <-- This thing here */
+  border: solid 2px #ccc;
+  border-radius: 5px;
+  overflow: hidden;
+  display:inline-block;
+}
+
+p.videoListItemActive:hover {
+  background-color: grey;
+  color: white;
+}
+
+img.videoListItem {
+  height: 1.2em;
+  margin-right: 10px;
+  margin-bottom: 5px;
+  vertical-align: middle;
 }
 
 div#videoList {
@@ -94,7 +126,7 @@ input.foldersListItem {
   height: 2em;
   margin: 5px auto;
   border: none;
-  border:solid 2px #ccc;
+  border: solid 2px #ccc;
   border-radius: 5px;
   overflow: hidden;
 }
