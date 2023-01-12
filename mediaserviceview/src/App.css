@@ -84,7 +84,7 @@ video {
 
 input#nextButton, input#prevoiusButton {
   width: 5em;
-  flex: initial;
+  flex: none;
 }
 
 input.foldersListItem {
