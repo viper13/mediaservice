@@ -1,5 +1,6 @@
 import './App.css';
 import React, { useState, useEffect, useRef } from 'react';
+import FileDownloadImage from './images/file-download.png';
 
 function LoadingItem(props) {
   return <p>waiting....</p>;
@@ -95,7 +96,7 @@ function NavigationBar(props)  {
           }) : ''}</p>
 
       <p id="plaing">Plaing: {props.video.name}</p>
-      <p id="recent">Last seen: <a id="recent_info" href="/TODO"></a></p>
+      <p id="recent">Last seen: <a id="recent_info" href="/"></a></p>
     </div>);
 }
 
@@ -129,7 +130,9 @@ function VideoList(props) {
     return (<div id="videoList">
         {props.files.map(value => {
           if (value.isVideo) {
-            return <p class="videoListItem"><input type='button' onClick={() => clickHandler(value)} value={value.name} /></p>;
+            return <input class="videoListItem" type='button' onClick={() => clickHandler(value)} value={value.name} />;
+          } else {
+            return '';
           }
         })}
       </div>);
@@ -159,10 +162,12 @@ function FoldersList(props) {
   if (Array.isArray(props.files)) {
     return (
       <div id="foldersList">
-        { props.files.map(value => { 
-          return value.isDirectory ? 
-                <p class="foldersListItem"><input type='button' onClick={() => clickHandler(value)} value={value.name} /></p> 
-                : ''
+        { props.files.map(value => {
+          if (value.isDirectory) {
+            return <p><input class="foldersListItem" type='button' onClick={() => clickHandler(value)} value={value.name} /></p>;
+          } else {
+            return '';
+          }
         })}
     </div>);
   } else {
@@ -171,7 +176,10 @@ function FoldersList(props) {
 }
 
 function DownloadsListItem(props) {
-  return (<p class="downloadsListItem"><a href={"download?src=" + props.file} >{props.name}</a></p>);
+  return (<p><p class="downloadsListItem">
+    <img class="downloadsListItem" src={FileDownloadImage} />
+    <a class="downloadsListItem" href={"download?src=" + props.file} >{props.name}</a>
+    </p></p>);
 }
 
 function DownloadsList(props) {
@@ -179,9 +187,11 @@ function DownloadsList(props) {
       return (
       <div id="downloadsList">
         { props.files.map(value => {
-          return value.isDirectory ? 
-                  '' 
-                  : <DownloadsListItem file={value.relativeName} name={value.name}/> ;
+            if (value.isDirectory) {
+              return '';
+            } else {
+              return <DownloadsListItem file={value.relativeName} name={value.name}/>;
+            }
           }) }
       </div> );
   } else {
