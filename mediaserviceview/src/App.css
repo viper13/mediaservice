@@ -35,7 +35,7 @@ div#playerSection {
 }
 
 div#navigationBar {
-  height: 6em;
+  height: 5em;
   width: 100%;
   background-color: burlywood;
   position: relative; /* need for using center class */
@@ -59,7 +59,6 @@ div#videoPlayer {
 }
 
 div#videoList {
-  height: 5em;
   width: max-content;
   background-color: gray;
 }
@@ -67,6 +66,10 @@ div#videoList {
 video {
   background-color: blue;
   height: inherit;
+}
+
+input#nextButton, input#prevoiusButton {
+  width: 5em;
 }
 
 div#foldersList {

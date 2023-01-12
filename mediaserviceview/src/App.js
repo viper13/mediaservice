@@ -11,27 +11,16 @@ function Header(props) {
       <div class="center"><p><a href="/">Home video player</a></p></div>
     </div>);
 }
-
-function PrevNextControls(props) {
+function PrevoiusButton(props) {
   const [prevoius, setPrevoius] = useState({});
-  const [next, setNext] = useState({});
-
   useEffect(() => {
     if (!props.video.file || !props.files)
       return;
     var prev = {};
-    var plusOne = {};
     var isVideoFound;
     isVideoFound = false;
     for (const value of props.files) {
-      if (!value.isVideo) {
-        continue;
-      }
-      if (Object.keys(plusOne).length !== 0) {
-        continue;
-      }
-      if (isVideoFound) {
-        plusOne = {file: value.relativeName, name:value.name};
+      if (!value.isVideo || isVideoFound) {
         continue;
       }
       if (value.name === props.video.name) {
@@ -40,24 +29,46 @@ function PrevNextControls(props) {
         prev = {file: value.relativeName, name:value.name};
       }
     }
-    if (!isVideoFound) {
-      setPrevoius({});
+    if (isVideoFound) {
+      setPrevoius(prev);
     }
-    setPrevoius(prev);
+  }, [props.video, props.files]);
+
+  function clickHandler() {
+    props.setVideo({file: prevoius.file, name: prevoius.name});
+  }
+
+  return (<input type='button' id="prevoiusButton" onClick={() => clickHandler()} value='Prevoius' disabled={!prevoius.file}></input>);
+}
+
+function NextButton(props) {
+  const [next, setNext] = useState({});
+  useEffect(() => {
+    if (!props.video.file || !props.files)
+      return;
+    var plusOne = {};// next
+    var isVideoFound;
+    isVideoFound = false;
+    for (const value of props.files) {
+      if (!value.isVideo || Object.keys(plusOne).length !== 0) {
+        continue;
+      }
+      if (isVideoFound) {
+        plusOne = {file: value.relativeName, name:value.name};
+        continue;
+      }
+      if (value.name === props.video.name) {
+        isVideoFound = true;
+      }
+    }
     setNext(plusOne);
   }, [props.video, props.files]);
 
-  function clickHandler(isNext) {
-    if (isNext) {
-      props.setVideo({file: next.file, name: next.name});
-    } else {
-      props.setVideo({file: prevoius.file, name: prevoius.name});
-    }
+  function clickHandler() {
+    props.setVideo({file: next.file, name: next.name});
   }
 
-  return (<p id="prevNextControls">
-    <input type='button' id="prevBtn" onClick={() => clickHandler(false)} value='Prevoius' disabled={!prevoius.file}></input>
-    <input type='button' id="nextBtn" onClick={() => clickHandler(true)} value='Next' disabled={!next.file}></input></p>);
+  return (<input type='button' id="nextButton" onClick={() => clickHandler()} value='Next' disabled={!next.file}></input>);
 }
 
 function NavigationBar(props)  {
@@ -85,7 +96,6 @@ function NavigationBar(props)  {
 
       <p id="plaing">Plaing: {props.video.name}</p>
       <p id="recent">Last seen: <a id="recent_info" href="/TODO"></a></p>
-      <PrevNextControls video={props.video} setVideo={props.setVideo} files={props.files}/>
     </div>);
 }
 
@@ -133,7 +143,9 @@ function PlayerSection(props)  {
     <div id="playerSection">
       <NavigationBar video={props.video} setVideo={props.setVideo} path={props.path} setPath={props.setPath} files={props.files}/>
       <div id="videoContent">
+        <PrevoiusButton video={props.video} setVideo={props.setVideo} files={props.files} />
         <VideoPlayer video={props.video} />
+        <NextButton video={props.video} setVideo={props.setVideo} files={props.files} />
         <VideoList files={props.files} video={props.video} setVideo={props.setVideo} />
       </div>
     </div>);
