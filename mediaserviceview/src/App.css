@@ -18,7 +18,7 @@ p {
 .App {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: auto;
   max-width: 80em;/* 80em */
   display: block;
   margin-left: auto;
@@ -27,18 +27,18 @@ p {
 
 div#header {
   height: 2em;
-  width: 100%;
+  width: auto;
   position: relative; /* need for using center class */
 }
 
 div#playerSection {
-  max-height: 70%;
-  width: 100%;
+  height: auto;
+  width: auto;
 }
 
 div#navigationBar {
   height: 5em;
-  width: 100%;
+  width: auto;
   position: relative; /* need for using center class */
 }
 
@@ -47,8 +47,8 @@ p#location {
 }
 
 div#videoContent {
-  height: 100%;
-  width: 100%;
+  height: auto;
+  width: auto;
   display: flex;
   flex-direction: row;
 }
@@ -68,7 +68,8 @@ p.videoListItem {
   border: solid 2px #ccc;
   border-radius: 5px;
   overflow: hidden;
-  display:inline-block;
+  word-break: break-all;
+  display: inline-block;
 }
 
 p.videoListItem:hover {
@@ -87,7 +88,7 @@ p.videoListItemActive {
   border: solid 2px #ccc;
   border-radius: 5px;
   overflow: hidden;
-  display:inline-block;
+  display: inline-block;
 }
 
 p.videoListItemActive:hover {
@@ -103,7 +104,7 @@ img.videoListItem {
 }
 
 div#videoList {
-  min-width: 5em;
+  min-width: 15em;
   flex: auto;
   height: 300px;/* same as for div#videoPlayer */
   overflow: auto;
@@ -123,13 +124,12 @@ span.foldersListItem {
   box-sizing: border-box;
   width: auto;
   padding: 2px 10px;
-  height: 2em;
-  margin: 5px auto;
+  margin: 5px 5px;
   border: none; /* <-- This thing here */
   border: solid 2px #ccc;
   border-radius: 5px;
-  overflow: hidden;
-  display:inline-block;
+  word-break: break-all;
+  flex: initial;
 }
 
 span.foldersListItem:hover {
@@ -140,24 +140,18 @@ span.foldersListItem:hover {
 
 img.foldersListItem {
   height: 1.2em;
-  margin-right: 10px;
-  margin-bottom: 37px;
-  vertical-align: middle;
+  flex: initial;
 }
 
 p.foldersListItem {
-  display:inline-block;
-  height: 2em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
 div#foldersList {
-  min-height: 15%;
-  width: 100%;
-}
-
-p.downloadsListItem {
-  display:inline-block;
-  height: 2em;
+  width: auto;
 }
 
 a.downloadsListItem:link, a.downloadsListItem:visited {
@@ -166,11 +160,12 @@ a.downloadsListItem:link, a.downloadsListItem:visited {
   border: 2px solid green;
   border:solid 2px #ccc;
   border-radius: 10px;
-  margin: 5px auto;
+  margin: 5px 5px;
   padding: 5px 10px;
   text-align: center;
   text-decoration: none;
-  display: inline-block;
+  word-break: break-all;
+  flex: initial;
 }
 
 a.downloadsListItem:hover, a.downloadsListItem:active {
@@ -180,23 +175,25 @@ a.downloadsListItem:hover, a.downloadsListItem:active {
 
 img.downloadsListItem {
   height: 1.8em;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  vertical-align: middle;
+  flex: initial;
 }
 
 p.downloadsListItem {
-  display:inline-block;
-  height: 2em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 9px;
+  min-width: 10em;
+  overflow: hidden;
 }
 
 div#downloadsList {
-  min-height: 15%;
-  width: 100%;
+  width: auto;
 }
 
 div#footer {
-  min-height: 5%;
-  width: 100%;
+  height: 3em;
+  width: auto;
   margin-top: 3em;
 }
