@@ -11,7 +11,6 @@ var app = express();
 http.createServer(app).listen(PORT);
 
 app.use("/", express.static("./mediaserviceview/build"));
-app.use(favicon('./favicon.ico'));
 
 app.get('/video', function (req, res) {
 	var logic = new LogicController;
@@ -26,6 +25,7 @@ app.get('/download', function(req, res){
 	logic.downloadFile(url_parts.query.src, res);
 });
 
+// not used but will be
 app.get('/recents', function (req, res) {
 	var logic = new LogicController;
 	logic.processRecentsRequest(req, res);
@@ -44,7 +44,7 @@ app.get('/explainPath', function (req, res) {
 });
 
 app.all('*', function (req, res) {
-	res.writeHeader(404, {"Content-Type": "text/html"});  
+	res.writeHead(404, {"Content-Type": "text/html"});  
 	res.write("No file.");
 	res.end();
 });
