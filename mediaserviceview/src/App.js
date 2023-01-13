@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import FileDownloadImage from './images/file-download.png';
 import PlayImage from './images/play.png';
 import PlayingImage from './images/video-playing.png';
+import FolderImage from './images/folder.png';
 
 function LoadingItem(props) {
   return <p>waiting....</p>;
@@ -176,17 +177,23 @@ function PlayerSection(props)  {
     </div>);
 }
 
-function FoldersList(props) {
+function FoldersListItem(props) {
   function clickHandler(value) {
-    console.log("Click to folder: " + value.name);
-    props.setPath(value.relativeName);
+    console.log("Click to folder: " + props.value.name);
+    props.setPath(props.value.relativeName);
   }
+  return (<p><p class="foldersListItem">
+    <img class="foldersListItem" src={FolderImage}/>
+    <span class="foldersListItem" type='button' onClick={() => clickHandler(props.value)}>{props.value.name}</span></p></p>);
+}
+
+function FoldersList(props) {
   if (Array.isArray(props.files)) {
     return (
       <div id="foldersList">
         { props.files.map(value => {
           if (value.isDirectory) {
-            return <p><input class="foldersListItem" type='button' onClick={() => clickHandler(value)} value={value.name} /></p>;
+            return <FoldersListItem value={value} setPath={props.setPath}/>;
           } else {
             return '';
           }
