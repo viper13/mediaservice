@@ -1,5 +1,7 @@
 import './App.css';
+
 import React, { useState, useEffect, useRef } from 'react';
+
 import FileDownloadImage from './images/file-download.png';
 import PlayImage from './images/play.png';
 import PlayingImage from './images/video-playing.png';
@@ -89,6 +91,11 @@ function NavigationBar(props)  {
     props.setPath(value.relativeName);
   }
 
+  function clickHandler2() {
+    console.log("Click to recent: " + JSON.parse(localStorage.getItem("lastVideo")).file);
+    props.setVideo(JSON.parse(localStorage.getItem("lastVideo")));
+  }
+
   useEffect(() => {
     console.log("Fetch location: " + props.path);
     const dataFetch = async () => {
@@ -98,6 +105,11 @@ function NavigationBar(props)  {
 
     dataFetch();
   }, [props.path]);
+
+  useEffect(() => {
+    localStorage.setItem("lastVideo", JSON.stringify(props.lastVideo));
+  }, [props.lastVideo]);
+
   return (
     <div id="navigationBar">
       <p id="location">{Array.isArray(detailedLocation) ? detailedLocation.map(value => {
@@ -105,7 +117,7 @@ function NavigationBar(props)  {
           }) : ''}</p>
 
       <p id="plaing">Plaing: {props.video.name}</p>
-      <p id="recent">Last seen: <a id="recent_info" href="/"></a></p>
+      <p id="recent">Last seen: <input type='button' onClick={() => clickHandler2()} value={props.lastVideo.name ?? ''} /></p>
     </div>);
 }
 
@@ -121,7 +133,8 @@ function VideoPlayer(props)  {
     video.play().catch(function(error) {
       console.log("Looks like user have not interact with document.");
     });
-  }, [props.video])
+    props.setLastVideo(props.video);
+  }, [props.video]);
 
   return (<div id="videoPlayer">
     <video id="video" ref={videoPlayer} controls>
@@ -165,12 +178,21 @@ function VideoList(props) {
 }
 
 function PlayerSection(props)  {
+  const [lastVideo, setLastVideo] = useState('');
+  if (lastVideo === '') {
+    try {
+      setLastVideo(JSON.parse(localStorage.getItem("lastVideo")));
+    } catch (error) {
+      console.error("Some issue with value of last video: " + error);
+      setLastVideo('');
+    }
+  }
   return (
     <div id="playerSection">
-      <NavigationBar video={props.video} setVideo={props.setVideo} path={props.path} setPath={props.setPath} files={props.files}/>
+      <NavigationBar video={props.video} setVideo={props.setVideo} path={props.path} setPath={props.setPath} files={props.files} lastVideo={lastVideo} setLastVideo={setLastVideo} />
       <div id="videoContent">
         <PrevoiusButton video={props.video} setVideo={props.setVideo} files={props.files} />
-        <VideoPlayer video={props.video} />
+        <VideoPlayer video={props.video} setLastVideo={setLastVideo} />
         <NextButton video={props.video} setVideo={props.setVideo} files={props.files} />
         <VideoList files={props.files} video={props.video} setVideo={props.setVideo} />
       </div>
