@@ -3,14 +3,13 @@ const PORT=8080;
 var http = require("http"),
 	url = require("url"),
 	express = require("express"),
-	favicon = require('serve-favicon'),
 	path = require("path"),
 	LogicController = require("./LogicController.js");
 
 var app = express();
 http.createServer(app).listen(PORT);
 
-app.use("/", express.static("./mediaserviceview/build"));
+app.use("/", express.static("../client/build"));
 
 app.get('/video', function (req, res) {
 	var logic = new LogicController;
