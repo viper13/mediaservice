@@ -10,10 +10,8 @@ Installed nodejs https://nodejs.org/. It must be available from command prompt.
 Installed ffmpeg https://www.ffmpeg.org/ it is neaded for video converting to mp4 format. It must be available from command prompt.
 
 # Run
-Once need to execute:
-server dir: npm install
-client dir: npm install, npm run build
-Then need to execute command "node server.js" by current seting it start server on 8080 port.
+Once need to execute bat or sh setup script.
+for runing please execute run sh or bat script.
 
 # Mongo DB
 expected DB 'mediaservice' and collection 'users'
