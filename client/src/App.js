@@ -83,17 +83,40 @@ function NextButton(props) {
   return (<input type='button' id="nextButton" onClick={() => clickHandler()} value='Next' disabled={!next.file}></input>);
 }
 
-function NavigationBar(props)  {
+function RecentVideo(props) {
+  function clickHandler() {
+    console.log("Click to recent: " + JSON.parse(localStorage.getItem("lastVideo")).file);
+    props.setVideo(JSON.parse(localStorage.getItem("lastVideo")));
+  }
+
+  useEffect(() => {
+    localStorage.setItem("lastVideo", JSON.stringify(props.lastVideo));
+  }, [props.lastVideo]);
+  if (!props.lastVideo || props.lastVideo === '') {
+    return '';
+  } else {
+    if (!!props.video && props.lastVideo.name === props.video.name) {
+      return '';
+    } else {
+      return (<p id="recent">Last seen: <input type='button' onClick={() => clickHandler()} value={props.lastVideo.name} /></p>);
+    }
+  }
+}
+
+function PlaingVideo(props) {
+  if (!!props.video) {
+    return (<p id="plaing">Plaing: {props.video.name}</p>);
+  } else {
+    return '';
+  }
+}
+
+function NavigationBar(props) {
   const [detailedLocation, setDetailedLocation] = useState(0);
 
   function clickHandler(value) {
     console.log("Click to location: " + value.name);
     props.setPath(value.relativeName);
-  }
-
-  function clickHandler2() {
-    console.log("Click to recent: " + JSON.parse(localStorage.getItem("lastVideo")).file);
-    props.setVideo(JSON.parse(localStorage.getItem("lastVideo")));
   }
 
   useEffect(() => {
@@ -106,18 +129,14 @@ function NavigationBar(props)  {
     dataFetch();
   }, [props.path]);
 
-  useEffect(() => {
-    localStorage.setItem("lastVideo", JSON.stringify(props.lastVideo));
-  }, [props.lastVideo]);
-
   return (
     <div id="navigationBar">
       <p id="location">{Array.isArray(detailedLocation) ? detailedLocation.map(value => {
             return <input type='button' onClick={() => clickHandler(value)} value={value.name} />;
           }) : ''}</p>
 
-      <p id="plaing">Plaing: {props.video.name}</p>
-      <p id="recent">Last seen: <input type='button' onClick={() => clickHandler2()} value={props.lastVideo.name ?? ''} /></p>
+      <PlaingVideo video={props.video} />
+      <RecentVideo lastVideo={props.lastVideo} video={props.video} />
     </div>);
 }
 
@@ -187,6 +206,7 @@ function PlayerSection(props)  {
       setLastVideo('');
     }
   }
+
   return (
     <div id="playerSection">
       <NavigationBar video={props.video} setVideo={props.setVideo} path={props.path} setPath={props.setPath} files={props.files} lastVideo={lastVideo} setLastVideo={setLastVideo} />
