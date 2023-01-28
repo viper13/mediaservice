@@ -1,3 +1,5 @@
-npm install ./server
-npm install ./client
-npm run build ./client
+cd server
+npm install
+cd ../client
+npm install
+npm run build
