@@ -10,8 +10,8 @@ Installed nodejs https://nodejs.org/. It must be available from command prompt.
 Installed ffmpeg https://www.ffmpeg.org/ it is neaded for video converting to mp4 format. It must be available from command prompt.
 
 # Run
-Once need to execute bat or sh setup script. All neaded actions are presented in that files. But I have recomend execute setup.sh in the gitbash.
+Once need to execute setup.sh script. All neaded actions are presented in it. But I have recomend execute it in the gitbash.
 for runing please execute run sh or bat script.
 
 # Mongo DB
-expected DB 'mediaservice' and collection 'users'
+expected DB 'mediaservice' and collection 'users'(not used now)
